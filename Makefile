@@ -6,5 +6,7 @@ CPP := parser.cpp \
 
 all:
 	$(CXX) $(CFLAGS) $(CPP)
+install:
+	cp ${PROG} /usr/local/bin
 clean: 
 	rm -f *.o $(PROG)
