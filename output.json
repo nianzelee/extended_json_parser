@@ -1,0 +1,41 @@
+{
+    "config": {
+       "variable1": "4.751724",
+	    "variable2": "1.304149",
+       "variable3": "26.615776",
+       "constant1": "200000",
+       "constant2": "0",
+       "constant3": "-10"
+    },
+    "list1": [
+        {
+            "variable1": "273.585924",
+            "variable2": "-6.342560"
+        }
+,
+        {
+            "variable1": "283.057566",
+            "variable2": "-8.060332"
+        }
+,
+        {
+            "variable1": "208.435719",
+            "variable2": "8.108501"
+        }
+    ],
+    "list2": [
+        {
+            "variable1": "0.425377",
+            "variable2": "341.134175",
+            "constant1": "-1.570796326794897",
+            "constant2": "0"
+    	}
+,
+        {
+            "variable1": "1.205400",
+            "variable2": "302.914682",
+            "constant1": "-1.570796326794897",
+            "constant2": "0"
+    	}
+    ]	
+}

@@ -1,0 +1,28 @@
+{
+    "config": {
+       "variable1": <uniform 0 20>,
+	    "variable2": <uniform 0 10>,
+       "variable3": <uniform 20 40>,
+       "constant1": "200000",
+       "constant2": "0",
+       "constant3": "-10"
+    },
+    "list1": [
+       <repeat 3>
+        {
+            "variable1": <uniform 40 300>,
+            "variable2": <uniform -10 10>
+        }
+       <\repeat>
+    ],
+    "list2": [
+       <repeat 2>
+        {
+            "variable1": <uniform 0 3>,
+            "variable2": <uniform 300 350>,
+            "constant1": "-1.570796326794897",
+            "constant2": "0"
+    	}
+      <\repeat>
+    ]	
+}
