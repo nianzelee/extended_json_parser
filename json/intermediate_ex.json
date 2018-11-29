@@ -1,0 +1,51 @@
+{
+    "config": {
+       "variable1": <uniform 0 20>,
+	    "variable2": <uniform 0 10>,
+       "variable3": <uniform 40 100>,
+       "constant1": "200000",
+       "constant2": "0",
+       "constant3": "-10"
+    },
+    "OS":
+       <constant "Linux">
+    ,
+	"speed":
+      <constant 0 "stop">
+   ,
+    "list1": [
+        {
+            "variable1": <uniform 40 300>,
+            "variable2": <uniform -10 10>
+        }
+,
+        {
+            "variable1": <uniform 40 300>,
+            "variable2": <uniform -10 10>
+        }
+,
+        {
+            "variable1": <uniform 40 300>,
+            "variable2": <uniform -10 10>
+        }
+    ],
+    "list2": [
+        {
+            "variable1":
+               <uniform 50 100 "fast">
+            ,
+            "variable2": <uniform 300 350>,
+            "constant1": "-1.570796326794897",
+            "constant2": "0"
+    	}
+,
+        {
+            "variable1":
+               <uniform 0 40 "slow">
+            ,
+            "variable2": <uniform 300 350>,
+            "constant1": "-1.570796326794897",
+            "constant2": "0"
+    	}
+    ]	
+}

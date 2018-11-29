@@ -1,7 +1,6 @@
 *.swp
 tags
 config_orig.json
-config_ex.json
+config_in_ex.json
+config_med_ex.json
 config_out.json
-temp.json
-example2.e.json

@@ -1,45 +1,49 @@
 {
     "config": {
-       "variable1": "3.331557",
-	    "variable2": "8.747298",
-       "variable3": "25.681093",
+       "variable1": "16.799151",
+	    "variable2": "8.774736",
+       "variable3": "82.094507",
        "constant1": "200000",
        "constant2": "0",
        "constant3": "-10"
     },
     "OS":
-Linux
+       "Linux"
+    ,
 	"speed":
-      "24.937909"
+      0
+   ,
     "list1": [
         {
-            "variable1": "270.916585",
-            "variable2": "3.885983"
+            "variable1": "66.346895",
+            "variable2": "-1.733171"
         }
 ,
         {
-            "variable1": "218.591713",
-            "variable2": "-0.612495"
+            "variable1": "199.249315",
+            "variable2": "-5.079285"
         }
 ,
         {
-            "variable1": "168.586234",
-            "variable2": "-0.437034"
+            "variable1": "228.259916",
+            "variable2": "7.749264"
         }
     ],
     "list2": [
         {
             "variable1":
-               "34.471745"
-            "variable2": "344.684520",
+               "83.006569"
+            ,
+            "variable2": "347.156943",
             "constant1": "-1.570796326794897",
             "constant2": "0"
     	}
 ,
         {
             "variable1":
-               "43.558311"
-            "variable2": "341.637742",
+               "4.783410"
+            ,
+            "variable2": "344.842534",
             "constant1": "-1.570796326794897",
             "constant2": "0"
     	}

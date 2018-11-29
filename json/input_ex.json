@@ -2,45 +2,48 @@
     "config": {
        "variable1": <uniform 0 20>,
 	    "variable2": <uniform 0 10>,
-       "variable3": <uniform 20 40>,
+       "variable3": <uniform 40 100>,
        "constant1": "200000",
        "constant2": "0",
        "constant3": "-10"
     },
     "OS":
 	 <choice>
-       <constant Linux>
-       <constant Windows>
-	 <\choice>,
+       <constant "Linux">
+       <constant "Windows">
+	 </choice>
+    ,
 	"speed":
    <choice>
-      <constant 0 stop>
-      <uniform 0 40 slow>
-      <uniform 30 60 med>
-      <uniform 50 100 fast>
-	<\choice>
+      <constant 0 "stop">
+      <uniform 0 40 "slow">
+      <uniform 30 60 "med">
+      <uniform 50 100 "fast">
+	</choice>
+   ,
     "list1": [
        <repeat 3>
         {
             "variable1": <uniform 40 300>,
             "variable2": <uniform -10 10>
         }
-       <\repeat>
+       </repeat>
     ],
     "list2": [
        <repeat 2>
         {
             "variable1":
             <choice>
-               <constant 0 stop>
-               <uniform 0 40 slow>
-               <uniform 30 60 med>
-               <uniform 50 100 fast>
-	         <\choice>
+               <constant 0 "stop">
+               <uniform 0 40 "slow">
+               <uniform 30 60 "med">
+               <uniform 50 100 "fast">
+	         </choice>
+            ,
             "variable2": <uniform 300 350>,
             "constant1": "-1.570796326794897",
             "constant2": "0"
     	}
-      <\repeat>
+      </repeat>
     ]	
 }
