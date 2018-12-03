@@ -5,20 +5,31 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include "nlohmann/json.hpp"
 using namespace std;
+using json = nlohmann::json;
 
 // helper function declaration
-void   writeLines      (const vector<string>&, const char*);
-void   get_keyword     (const string&, string&, vector<string>&);
-void   parse_token     (const string&, vector<string>&);
-size_t find_block_end  (const vector<string>&, string, size_t);
-void   expand_choice   (const vector<string>&, vector<string>&);
-void   expand_repeat   (const vector<string>&, vector<string>&);
-void   expand_values   (const vector<string>&, vector<string>&);
-void   gen_sample      (string&, const vector<string>&);
-double randomDouble    (double, double);
-size_t randomSizet     (size_t, size_t);
-void   get_constant    (string&, const vector<string>&);
+void   writeLines          (const vector<string>&, const char*);
+void   exec                (const char* cmd, string&);
+// parsing
+void   get_keyword         (const string&, string&, vector<string>&);
+void   parse_token         (const string&, vector<string>&);
+size_t find_block_end      (const vector<string>&, string, size_t);
+// generation
+void   expand_choice       (const vector<string>&, vector<string>&);
+void   expand_repeat       (const vector<string>&, vector<string>&);
+void   expand_values       (const vector<string>&, vector<string>&);
+void   gen_sample          (string&, const vector<string>&);
+double randomDouble        (double, double);
+size_t randomSizet         (size_t, size_t);
+void   get_constant        (string&, const vector<string>&);
+// parsing JSON
+void parse_json_lines      (const vector<string>&, json&);
+// generating constraints from JSON
+void generate_constraints  (vector<string>&, vector<string>&, json&, string);
+// checking satisfiability
+bool is_sat                (string&);
 
 // helper function definition
 void
@@ -29,6 +40,16 @@ writeLines(const vector<string> &lines, const char *name)
    for (size_t i = 0; i < lines.size(); ++i)
       out << lines[i] << endl;
    out.close();
+}
+
+void
+exec( const char* cmd, string &result )
+{
+   array<char, 128> buf;
+   unique_ptr<FILE, decltype( &pclose )> pipe( popen( cmd, "r" ), pclose );
+   if ( !pipe ) throw runtime_error("popen() failed!");
+   while ( fgets( buf.data(), buf.size(), pipe.get() ) != nullptr )
+      result += buf.data();
 }
 
 void
@@ -196,9 +217,99 @@ randomSizet(size_t min, size_t max)
    return min + (size_t)rand() % (max-min+1);
 }
 
+void
+parse_json_lines ( const vector<string> &all_lines, json &object )
+{
+   string tmp_str;
+   char* tmp_c_str;
+
+   for ( size_t i = 0; i < all_lines.size(); ++i ) {
+      tmp_str.append( all_lines[ i ]) ;
+      tmp_str.append( "\n" );
+   }
+   tmp_c_str = new char [ tmp_str.length()+1 ];
+   strcpy( tmp_c_str, tmp_str.c_str() );
+
+   object = json::parse( tmp_c_str );
+}
+
+void
+generate_constraints( vector<string> &declarations,
+                      vector<string> &constraints,
+                      json &object,
+                      string prefix )
+{
+   if ( object.is_object() )
+   {
+      for ( json::iterator it = object.begin(); it != object.end(); ++it )
+      {
+         string new_prefix;
+         new_prefix.append( prefix );
+         if ( ! new_prefix.empty() )
+            new_prefix.append( "-" );
+         new_prefix.append( it.key() );
+         generate_constraints( declarations,
+                               constraints,
+                               it.value(),
+                               new_prefix );
+      }
+   }
+   else if ( object.is_array() )
+   {
+      for ( size_t i = 0; i < object.size(); ++i )
+      {
+         string new_prefix;
+         new_prefix.append( prefix );
+         if ( ! new_prefix.empty() )
+            new_prefix.append( "-" );
+         new_prefix.append( to_string( i ) );
+         generate_constraints( declarations,
+                               constraints,
+                               object[ i ],
+                               new_prefix );
+      }
+   }
+   else if ( object.is_string() )
+   {
+      string declaration;
+      string constraint;
+      declaration.append( "(declare-fun " );
+      declaration.append( prefix );
+      declaration.append( " () Real)" );
+      declarations.push_back( declaration );
+      constraint.append( "(assert (= " );
+      constraint.append( prefix );
+      constraint.append( " " );
+      constraint.append( object );
+      constraint.append( "))" );
+      constraints.push_back( constraint );
+   }
+   else if ( object.is_number() )
+   {
+      cerr << "Unsupported: number in the JSON file, prefix = "
+           << prefix
+           << endl;
+      exit( 1 );
+   }
+   else if ( object.is_boolean() )
+   {
+      cerr << "Unsupported: boolean in the JSON file, prefix = "
+           << prefix
+           << endl;
+      exit( 1 );
+   }
+}
+
+bool
+is_sat ( string &result )
+{
+  return ( result.front() == 'd' );
+}
+
 int
 main(int argc, char ** argv)
 {
+   int samples = 0;
    if ( argc != 3 && argc != 4 ) {
       printf("[INFO] Usage: $> exj_parser <input file> [intermediate file] <output file>\n");
       printf("                 input file:        extended json file\n");
@@ -228,8 +339,38 @@ main(int argc, char ** argv)
    vector<string> no_choice_lines;
    expand_choice(no_repeat_lines, no_choice_lines);
    if (argc == 4) writeLines(no_choice_lines, med);
-   vector<string> no_uniform_lines;
-   expand_values(no_choice_lines, no_uniform_lines);
-   writeLines(no_uniform_lines, out);
+   while ( samples < 1 )
+   {
+      vector<string> no_uniform_lines, declarations, constraints,
+                     ext_constraints;
+      string constraints_filename, cmd, result;
+      json object;
+
+      expand_values(no_choice_lines, no_uniform_lines);
+
+      constraints_filename.append( "output.smt2" );
+      ext_constraints.push_back( "(assert (< list1-0-variable1 50.0))" );
+
+      parse_json_lines( no_uniform_lines, object );
+      declarations.push_back( "(set-logic QF_NRA)" );
+      generate_constraints( declarations, constraints, object, "" );
+      declarations.insert( declarations.end(),
+                           ext_constraints.begin(),
+                           ext_constraints.end() );
+      declarations.insert( declarations.end(),
+                           constraints.begin(),
+                           constraints.end() );
+      declarations.push_back( "(check-sat)" );
+      declarations.push_back( "(exit)" );
+      writeLines( declarations, constraints_filename.c_str() );
+      cmd.append( "dReal " );
+      cmd.append( constraints_filename );
+      exec( cmd.c_str(), result );
+      if ( is_sat( result ) )
+      {
+         writeLines(no_uniform_lines, out);
+         samples++;
+      }
+   }
    return 0;
 }
